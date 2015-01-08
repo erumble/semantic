@@ -94,20 +94,19 @@ module Semantic
       end
     end
 
-    [:major, :minor, :patch].each do |term|
-      define_method("#{term}!") { increment!(term) }
+    [:increment_major, :increment_minor, :increment_patch].each do |term|
+      define_method("#{term}!") { increment!(term.to_s.gsub('increment_', '').to_sym) }
     end
 
     def increment!(term)
-      new_version = clone
       new_value = send(term) + 1
 
-      new_version.send("#{term}=", new_value)
-      new_version.minor = 0 if term == :major
-      new_version.patch = 0 if term == :major || term == :minor
-      new_version.build = new_version.pre = nil
+      self.send("#{term}=", new_value)
+      self.minor = 0 if term == :major
+      self.patch = 0 if term == :major || term == :minor
+      self.build = self.pre = nil
 
-      new_version
+      self 
     end
 
     private
